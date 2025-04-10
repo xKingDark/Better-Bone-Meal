@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "better-bone-meal",
+  "name": "Better Bone Meal",
+  "description": "Allows bone meal to be used on more crops such as sugar cane!",
+  "version": "${version}",
+  "authors": [ "xKingDark" ],
+  "contact": {
+    "sources": "https://github.com/DarkGamerYT/Better-Bone-Meal",
+    "issues": "https://github.com/DarkGamerYT/Better-Bone-Meal/issues"
+  },
+  "license": "LGPL-3.0",
+  "icon": "icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [ "com.xkingdark.betterbonemeal.Main" ]
+  },
+  "mixins": [ "xkingdark.mixins.json" ],
+  "depends": {
+    "fabric": "*",
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "${minecraft_version}"
+  }
+}

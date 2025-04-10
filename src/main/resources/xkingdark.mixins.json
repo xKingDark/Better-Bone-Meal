@@ -1,0 +1,14 @@
+{
+    "required": true,
+    "minVersion": "0.8",
+    "package": "com.xkingdark.betterbonemeal.core.mixin",
+    "compatibilityLevel": "JAVA_21",
+    "mixins": [
+        "blocks.CactusBlockMixin",
+        "blocks.SugarCaneBlockMixin",
+        "blocks.VineBlockMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}
