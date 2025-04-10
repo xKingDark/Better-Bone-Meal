@@ -6,7 +6,8 @@
     "mixins": [
         "blocks.CactusBlockMixin",
         "blocks.SugarCaneBlockMixin",
-        "blocks.VineBlockMixin"
+        "blocks.VineBlockMixin",
+        "items.BoneMealItemMixin"
     ],
     "injectors": {
         "defaultRequire": 1
