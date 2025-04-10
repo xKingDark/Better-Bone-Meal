@@ -5,6 +5,7 @@
     "compatibilityLevel": "JAVA_21",
     "mixins": [
         "blocks.CactusBlockMixin",
+        "blocks.NetherWartBlockMixin",
         "blocks.SugarCaneBlockMixin",
         "blocks.VineBlockMixin",
         "items.BoneMealItemMixin"
