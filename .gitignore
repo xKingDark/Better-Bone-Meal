@@ -1,6 +1,9 @@
-/.gradle/
-/build/
-/run/
+.gradle/
+build/
+bin/
+run/
+
+**/.DS_Store
 
 /.idea/*
 !/.idea/misc.xml
