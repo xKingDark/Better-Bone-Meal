@@ -45,7 +45,7 @@ public class BoneMealItemMixin {
                         int maxAge = crop.getMaxAge();
                         int age = crop.getAge(blockState);
 
-                        if (!world.isClient) {
+                        if (!world.isClient()) {
                             context.getPlayer().emitGameEvent(GameEvent.ITEM_INTERACT_FINISH);
                             world.syncWorldEvent(1505, blockPos, 15);
                         };
