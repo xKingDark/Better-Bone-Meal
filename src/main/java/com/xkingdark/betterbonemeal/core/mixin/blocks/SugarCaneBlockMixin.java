@@ -1,83 +1,88 @@
 package com.xkingdark.betterbonemeal.core.mixin.blocks;
 
-import com.xkingdark.betterbonemeal.Main;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Fertilizable;
-import net.minecraft.block.SugarCaneBlock;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.BonemealableBlock;
+import net.minecraft.world.level.block.SugarCaneBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.UnknownNullability;
+import org.jspecify.annotations.NonNull;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @Mixin(SugarCaneBlock.class)
-public abstract class SugarCaneBlockMixin extends Block implements Fertilizable {
-    public SugarCaneBlockMixin(Settings settings) {
-        super(settings);
+public abstract class SugarCaneBlockMixin extends Block implements BonemealableBlock {
+    public SugarCaneBlockMixin(BlockBehaviour.Properties properties) {
+        super(properties);
     };
 
     @Override
-    public boolean isFertilizable(WorldView world, BlockPos pos, BlockState state) {
-        ArrayList<BlockPos> list = this.getBlocks((World) world, pos);
-        BlockPos up = list.getLast().up();
-        int maxY = world.getTopYInclusive();
-        if (!world.isAir(up) || up.getY() >= maxY)
+    public boolean isValidBonemealTarget(LevelReader level, @NonNull BlockPos pos, @NonNull BlockState state) {
+        ArrayList<BlockPos> list = this.getBlocks((Level) level, pos);
+
+        BlockPos up = list.getLast().above();
+        int maxY = level.getMaxY();
+
+        if (!level.isEmptyBlock(up) || up.getY() >= maxY) {
             return false;
+        }
 
         return list.size() < 3;
-    };
+    }
 
     @Override
-    public boolean canGrow(World world, Random random, BlockPos pos, BlockState state) {
+    public boolean isBonemealSuccess(@NonNull Level level, @NonNull RandomSource random, @NonNull BlockPos pos, @NonNull BlockState state) {
         return true;
-    };
+    }
 
     @Override
-    public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
+    public void performBonemeal(ServerLevel level, @NonNull RandomSource random, BlockPos pos, @NonNull BlockState state) {
         SugarCaneBlock block = (SugarCaneBlock)(Object)this;
 
-        int height = world.getHeight();
+        int height = level.getHeight();
         for (int y = pos.getY(); y <= height; y++) {
-            BlockPos up = pos.withY(y);
-            BlockState blockState = world.getBlockState(up);
-            if (blockState.isOf(block))
+            BlockPos up = pos.atY(y);
+            BlockState blockState = level.getBlockState(up);
+            if (blockState.is(block)) {
                 continue;
+            }
 
-            if (!world.isAir(up))
+            if (!level.isEmptyBlock(up)) {
                 break;
+            }
 
-            world.setBlockState(up, this.getDefaultState());
-            world.setBlockState(up.down(), state.with(SugarCaneBlock.AGE, 0), 260);
+            level.setBlockAndUpdate(up, this.defaultBlockState());
+            level.setBlock(up.below(), state.trySetValue(SugarCaneBlock.AGE, 0), 260);
             break;
-        };
-    };
+        }
+    }
 
     @Unique
-    private ArrayList<BlockPos> getBlocks(World world, BlockPos pos) {
+    private ArrayList<BlockPos> getBlocks(@UnknownNullability Level world, BlockPos pos) {
         SugarCaneBlock block = (SugarCaneBlock)(Object)this;
         ArrayList<BlockPos> positions = new ArrayList<>();
 
         int x = 1;
-        while (world.getBlockState(pos.down(x)).isOf(block)) {
-            positions.add(pos.down(x));
+        while (world.getBlockState(pos.below(x)).is(block)) {
+            positions.add(pos.below(x));
             x++;
-        };
+        }
 
         positions.add(pos);
 
         int z = 1;
-        while (world.getBlockState(pos.up(z)).isOf(block)) {
-            positions.add(pos.up(z));
+        while (world.getBlockState(pos.above(z)).is(block)) {
+            positions.add(pos.above(z));
             z++;
-        };
+        }
 
         return positions;
-    };
-};
+    }
+}

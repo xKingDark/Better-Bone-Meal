@@ -1,64 +1,67 @@
 package com.xkingdark.betterbonemeal.core.mixin.blocks;
 
-import net.minecraft.block.*;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.NonNull;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.ArrayList;
 
 @Mixin(VineBlock.class)
-public class VineBlockMixin extends Block implements Fertilizable {
-    public VineBlockMixin(Settings settings) {
-        super(settings);
+public class VineBlockMixin extends Block implements BonemealableBlock {
+    public VineBlockMixin(BlockBehaviour.Properties properties) {
+        super(properties);
     };
 
     @Override
-    public boolean isFertilizable(WorldView world, BlockPos pos, BlockState state) {
+    public boolean isValidBonemealTarget(LevelReader level, @NonNull BlockPos pos, @NonNull BlockState state) {
         VineBlock block = (VineBlock)(Object)this;
         ArrayList<BlockPos> positions = new ArrayList<>();
         positions.add(pos);
 
         int x = 1;
-        while (world.getBlockState(pos.down(x)).isOf(block)) {
-            positions.add(pos.down(x));
+        while (level.getBlockState(pos.below(x)).is(block)) {
+            positions.add(pos.below(x));
             x++;
-        };
+        }
 
-        int minY = world.getDimension().minY();
-        BlockPos down = positions.getLast().down();
-        return world.isAir(down) && down.getY() >= minY;
-    };
+        int minY = level.dimensionType().minY();
+        BlockPos down = positions.getLast().below();
+
+        return level.isEmptyBlock(down) && down.getY() >= minY;
+    }
 
     @Override
-    public boolean canGrow(World world, Random random, BlockPos pos, BlockState state) {
+    public boolean isBonemealSuccess(@NonNull Level level, @NonNull RandomSource random, @NonNull BlockPos pos, @NonNull BlockState state) {
         return true;
-    };
+    }
 
     @Override
-    public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
+    public void performBonemeal(ServerLevel level, @NonNull RandomSource random, BlockPos pos, @NonNull BlockState state) {
         VineBlock block = (VineBlock)(Object)this;
 
-        int minY = world.getDimension().minY();
+        int minY = level.dimensionType().minY();
         for (int y = pos.getY(); y >= minY; y--) {
-            BlockPos down = pos.withY(y);
-            BlockState blockState = world.getBlockState(down);
+            BlockPos down = pos.atY(y);
+            BlockState blockState = level.getBlockState(down);
 
-            if (blockState.isOf(block))
+            if (blockState.is(block)) {
                 continue;
+            }
 
-            if (!world.isAir(down))
+            if (!level.isEmptyBlock(down)) {
                 break;
+            }
 
-            world.setBlockState(down, state);
-            world.setBlockState(down.up(), state, 260);
+            level.setBlockAndUpdate(down, state);
+            level.setBlock(down.below(), state, 260);
             break;
-        };
-    };
-};
+        }
+    }
+}
