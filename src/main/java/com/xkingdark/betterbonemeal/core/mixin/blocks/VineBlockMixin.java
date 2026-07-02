@@ -47,20 +47,19 @@ public class VineBlockMixin extends Block implements BonemealableBlock {
         VineBlock block = (VineBlock)(Object)this;
 
         int minY = level.dimensionType().minY();
-        for (int y = pos.getY(); y >= minY; y--) {
-            BlockPos down = pos.atY(y);
-            BlockState blockState = level.getBlockState(down);
+        for (int y = pos.getY(); y >= minY; --y) {
+            BlockPos current = pos.atY(y);
+            BlockState currentState = level.getBlockState(current);
 
-            if (blockState.is(block)) {
+            if (currentState.is(block)) {
                 continue;
             }
 
-            if (!level.isEmptyBlock(down)) {
+            if (!currentState.isAir()) {
                 break;
             }
 
-            level.setBlockAndUpdate(down, state);
-            level.setBlock(down.below(), state, 3);
+            level.setBlockAndUpdate(current, state);
             break;
         }
     }

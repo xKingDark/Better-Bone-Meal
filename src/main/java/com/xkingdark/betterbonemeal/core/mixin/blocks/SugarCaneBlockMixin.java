@@ -48,18 +48,17 @@ public abstract class SugarCaneBlockMixin extends Block implements BonemealableB
 
         int height = level.getHeight();
         for (int y = pos.getY(); y <= height; y++) {
-            BlockPos up = pos.atY(y);
-            BlockState blockState = level.getBlockState(up);
-            if (blockState.is(block)) {
+            BlockPos current = pos.atY(y);
+            BlockState currentState = level.getBlockState(current);
+            if (currentState.is(block)) {
                 continue;
             }
 
-            if (!level.isEmptyBlock(up)) {
+            if (!level.isEmptyBlock(current)) {
                 break;
             }
 
-            level.setBlockAndUpdate(up, this.defaultBlockState());
-            level.setBlock(up.below(), state.trySetValue(SugarCaneBlock.AGE, 0), 3);
+            level.setBlockAndUpdate(current, this.defaultBlockState());
             break;
         }
     }
