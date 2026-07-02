@@ -59,7 +59,7 @@ public abstract class SugarCaneBlockMixin extends Block implements BonemealableB
             }
 
             level.setBlockAndUpdate(up, this.defaultBlockState());
-            level.setBlock(up.below(), state.trySetValue(SugarCaneBlock.AGE, 0), 260);
+            level.setBlock(up.below(), state.trySetValue(SugarCaneBlock.AGE, 0), 3);
             break;
         }
     }

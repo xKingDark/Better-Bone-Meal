@@ -62,7 +62,7 @@ public abstract class CactusBlockMixin extends Block implements BonemealableBloc
             level.setBlockAndUpdate(up, this.defaultBlockState());
 
             BlockState newState = state.trySetValue(CactusBlock.AGE, 0);
-            level.setBlock(up.below(), newState, 260);
+            level.setBlock(up.below(), newState, 3);
             level.neighborChanged(newState, up, this, null, false);
             break;
         }

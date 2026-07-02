@@ -60,7 +60,7 @@ public class VineBlockMixin extends Block implements BonemealableBlock {
             }
 
             level.setBlockAndUpdate(down, state);
-            level.setBlock(down.below(), state, 260);
+            level.setBlock(down.below(), state, 3);
             break;
         }
     }
